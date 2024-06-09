@@ -1,0 +1,105 @@
+/*
+ * @NOTE: Prepend a `~` to css file paths that are in your node_modules
+ *        See https://github.com/webpack-contrib/sass-loader#imports
+ */
+
+/* Animation Keyframes */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+body {
+  position: relative;
+  color: white;
+  height: 95vh;
+  background: black;
+  font-family: 'Arial Rounded MT';
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+button {
+  background-color: black;
+  color: white;
+  padding: 5px 5px;
+  border-radius: 5px;
+  border-color: red;
+  border: none;
+  appearance: none;
+  font-size: 1.3rem;
+  font-family: 'Agency FB';
+  box-shadow: none;
+  transition: all ease-in 0.1s;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+button:hover {
+  transform: scale(1.05);
+  opacity: 1;
+}
+
+li {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  height: fit-content;
+  width: fit-content;
+  margin: 5px;
+}
+
+a:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.Hello {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.indicator {
+  margin-top: 10px;
+}
+
+.recording-indicator {
+  width: 25px;
+  height: 25px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+.idle-indicator {
+  width: 23px;
+  height: 23px;
+  background-color: grey;
+  border-radius: 50%;
+}
+
+/* Container styling for centering */
+.logo {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+ 
+  margin: 10px 0; /* Maintains spacing around the container */
+}
+
+  /* Image specific styling */
+  .logo img {
+    animation: rotate 20s linear infinite; /* Only handle animation here */
+    display: block; /* Ensures proper rendering */
+    max-width: 100%; /* Ensures the image is responsive */
+    height: auto; /* Maintains aspect ratio */
+  }

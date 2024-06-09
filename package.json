@@ -1,0 +1,18 @@
+{
+  "name": "g4l",
+  "version": "1.0.0",
+  "main": "commentedout.js",
+  "dependencies": {
+    "fluent-ffmpeg": "^2.1.3",
+    "nvm": "^0.0.4",
+    "python-shell": "^5.0.0",
+    "socket.io-client": "^4.7.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

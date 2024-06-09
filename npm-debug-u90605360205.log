@@ -1,0 +1,7 @@
+npm ERR! code EBUSY
+npm ERR! syscall open
+npm ERR! path C:\g4l\package-lock.json
+npm ERR! errno -4082
+npm ERR! EBUSY: resource busy or locked, open 'C:\g4l\package-lock.json'
+
+npm ERR! A complete log of this run can be found in: C:\Users\Kevin\AppData\Local\npm-cache\_logs\2024-05-30T03_40_53_078Z-debug-0.log
