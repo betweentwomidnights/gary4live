@@ -1,7 +1,0 @@
-npm ERR! code EJSONPARSE
-npm ERR! path C:\g4l/package.json
-npm ERR! JSON.parse Unexpected end of JSON input while parsing empty string
-npm ERR! JSON.parse Failed to parse JSON data.
-npm ERR! JSON.parse Note: package.json must be actual JSON, not just JavaScript.
-
-npm ERR! A complete log of this run can be found in: C:\Users\Kevin\AppData\Local\npm-cache\_logs\2024-06-05T12_08_17_295Z-debug-0.log
