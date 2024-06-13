@@ -1,7 +1,7 @@
 const Max = require('max-api');
 const fs = require('fs');
 const io = require('socket.io-client');
-const socket = io('http://199.126.197.240:26531', {
+const socket = io('http://localhost:8000', {
     transports: ['websocket'], // Force WebSocket usage
     reconnection: true, // Enable auto-reconnection
     reconnectionAttempts: Infinity, // Unlimited reconnection attempts
