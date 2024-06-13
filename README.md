@@ -30,8 +30,9 @@ the final remaining edge cases revolve around these two files: myBuffer.wav and 
 
 do NOT:
 
-drag them into the ableton timeline.
-manually change myBuffer.wav to a 6 minute audio file. it should only be changed by our write function and should be a maximum of 30 seconds.
+- drag them into the ableton timeline.
+- manually change myBuffer.wav to a 6 minute audio file. it should only be changed by our write function and should be a maximum of 30 seconds.
+
 
 there is a separate repository kev still needs to push that is specific to mac users. (https://github.com/betweentwomidnights/gary-mac)
 
