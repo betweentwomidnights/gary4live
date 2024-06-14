@@ -10,15 +10,16 @@ you'll need to install node and npm first. it's not too bad.
 
 ![gary4live](./gary4live%20screenshot.png)
 
-clone this repo:
+clone this repo:  
 https://github.com/betweentwomidnights/gary4live
+	```sh
 rename gary4live to g4l
 cd C:\\g4l\\g4l-ui
 npm install
 npm start (you can run it in dev mode)
-npm run package (this creates the exe that the '2(launch electron)' button triggers in gary4live. 
+npm run package (this creates the exe that the '2(launch electron)' button triggers in gary4live)
 
-in the ableton browser, add the g4l folder. 
+in the ableton browser, add the g4l folder.  
 
 GARY.amxd is the device.
 
@@ -32,7 +33,6 @@ do NOT:
 
 - drag them into the ableton timeline.
 - manually change myBuffer.wav to a 6 minute audio file. it should only be changed by our write function and should be a maximum of 30 seconds.
-
 
 there is a separate repository kev still needs to push that is specific to mac users. (https://github.com/betweentwomidnights/gary-mac)
 
