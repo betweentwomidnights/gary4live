@@ -1,7 +1,6 @@
 ffmpeg-master-latest-win64-gpl/
 node_modules/
 g4l-ui/node_modules/
-g4l-ui/saved_audio/
 *.logg4l-ui/saved-audio/ 
 *.wav
 *.wav.asd
