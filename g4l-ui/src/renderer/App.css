@@ -103,3 +103,63 @@ a:hover {
     max-width: 100%; /* Ensures the image is responsive */
     height: auto; /* Maintains aspect ratio */
   }
+
+  .timeline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    position: relative;
+    height: 15px; /* Adjust height for better visibility of ticks */
+  }
+  
+  .timeline-tick {
+    position: relative;
+    flex-grow: 1;
+    text-align: center;
+  }
+  
+  .timeline-label {
+    font-size: 12px;
+    color: white; /* Change label color to white */
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .timeline-mark {
+    height: 10px;
+    width: 1px;
+    background-color: white; /* Change tick mark color to white */
+    display: inline-block;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .timeline-tick::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 5px; /* Height for tick marks for seconds */
+    width: 1px;
+    background-color: white; /* Change tick mark color to white */
+  }
+  
+  .timeline-tick:nth-child(5n + 1)::before {
+    height: 10px; /* Longer tick marks for every 5 seconds */
+  }
+  
+  
+  .waveform {
+    margin-bottom: 5px; /* Adjust spacing between first waveform and timeline */
+  }
+  
+  .waveform-out {
+    margin-top: 5px; /* Adjust spacing between timeline and second waveform */
+  }

@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\g4l-ui",
+    "\\g4l-ui\\src",
+    "\\g4l-ui\\src\\main",
+    "\\g4l-ui\\src\\renderer"
   ],
-  "SelectedNode": "\\update_path.bat",
+  "SelectedNode": "\\g4l-ui\\tsconfig.json",
   "PreviewInSolutionExplorer": false
 }
