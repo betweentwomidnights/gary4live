@@ -1,9 +1,0 @@
-npm ERR! code EJSONPARSE
-npm ERR! path C:\g4l/package.json
-npm ERR! JSON.parse Expected property name or '}' in JSON at position 364 while parsing '{
-npm ERR! JSON.parse   "name": "g4l",
-npm ERR! JSON.parse   "version": "1.0.0",'
-npm ERR! JSON.parse Failed to parse JSON data.
-npm ERR! JSON.parse Note: package.json must be actual JSON, not just JavaScript.
-
-npm ERR! A complete log of this run can be found in: C:\Users\Kevin\AppData\Local\npm-cache\_logs\2024-06-10T15_56_13_277Z-debug-0.log

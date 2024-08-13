@@ -5,4 +5,5 @@ g4l-ui/saved_audio/
 *.logg4l-ui/saved-audio/ 
 *.wav
 *.wav.asd
+*.log
 node-v20.13.1-x64.msi
