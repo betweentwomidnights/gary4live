@@ -44,6 +44,7 @@ To create the executable that the '2(launch electron)' button triggers in gary4l
 
 ```
 npm run package
+```
 
 in the ableton browser, add the g4l folder.  
 
