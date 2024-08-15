@@ -10,14 +10,40 @@ you'll need to install node and npm first. it's not too bad.
 
 ![gary4live](./gary4live%20screenshot.png)
 
-clone this repo:  
-https://github.com/betweentwomidnights/gary4live
-	```sh
-rename gary4live to g4l
-cd C:\\g4l\\g4l-ui
+lone this repository:
+
+```
+git clone https://github.com/betweentwomidnights/gary4live
+```
+
+Rename the directory:
+
+```
+mv gary4live g4l
+```
+
+Navigate to the `g4l-ui` directory:
+
+```
+cd C:\g4l\g4l-ui
+```
+
+Install the required packages:
+
+```
 npm install
-npm start (you can run it in dev mode)
-npm run package (this creates the exe that the '2(launch electron)' button triggers in gary4live)
+```
+
+To start the application in development mode:
+
+```
+npm run start
+```
+
+To create the executable that the '2(launch electron)' button triggers in gary4live:
+
+```
+npm run package
 
 in the ableton browser, add the g4l folder.  
 
