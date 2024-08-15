@@ -10,7 +10,7 @@ you'll need to install node and npm first. it's not too bad.
 
 ![gary4live](./gary4live%20screenshot.png)
 
-lone this repository:
+clone this repository:
 
 ```
 git clone https://github.com/betweentwomidnights/gary4live
