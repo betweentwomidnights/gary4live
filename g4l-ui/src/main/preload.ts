@@ -6,7 +6,8 @@ export type Channels =
   | 'ipc-example'
   | 'save-audio-file'
   | 'audio-file-saved'
-  | 'ondragstart';
+  | 'ondragstart'
+  | 'toggle-guide'; // Add this line
 
 const electronHandler = {
   ipcRenderer: {

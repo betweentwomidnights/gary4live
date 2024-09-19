@@ -4,6 +4,7 @@ import {
   shell,
   BrowserWindow,
   MenuItemConstructorOptions,
+  MenuItem,
 } from 'electron';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
@@ -26,7 +27,7 @@ export default class MenuBuilder {
       this.setupDevelopmentEnvironment();
     }
 
-    const template =
+    const template: MenuItemConstructorOptions[] =
       process.platform === 'darwin'
         ? this.buildDarwinTemplate()
         : this.buildDefaultTemplate();
@@ -155,6 +156,15 @@ export default class MenuBuilder {
       label: 'Help',
       submenu: [
         {
+          label: 'Show Guide',
+          type: 'checkbox',
+          checked: false,
+          click: (menuItem) => {
+            const isChecked = menuItem.checked;
+            this.mainWindow.webContents.send('toggle-guide', isChecked);
+          },
+        },
+        {
           label: 'hear stuff made using this',
           click() {
             shell.openExternal('https://youtube.com/@thecollabagepatch');
@@ -255,6 +265,19 @@ export default class MenuBuilder {
       {
         label: 'Help',
         submenu: [
+          {
+            label: 'Show Guide',
+            type: 'checkbox',
+            checked: false,
+            click: (
+              menuItem: MenuItem,
+              _browserWindow: BrowserWindow,
+              _event: KeyboardEvent
+            ) => {
+              const isChecked = menuItem.checked;
+              this.mainWindow.webContents.send('toggle-guide', isChecked);
+            },
+          },
           {
             label: 'hear stuff made using this',
             click() {

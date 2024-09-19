@@ -3,12 +3,14 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 
-/* Animation Keyframes */
-@keyframes rotate {
+ .logo.spin img {
+  animation: spin 10s linear infinite; /* Adjust the duration as needed */
+}
+
+@keyframes spin {
   from {
     transform: rotate(0deg);
   }
-
   to {
     transform: rotate(360deg);
   }
@@ -28,7 +30,7 @@ body {
 button {
   background-color: black;
   color: white;
-  padding: 5px 5px;
+  padding: 0px 2px;
   border-radius: 5px;
   border-color: red;
   border: none;
@@ -54,7 +56,7 @@ a {
   text-decoration: none;
   height: fit-content;
   width: fit-content;
-  margin: 5px;
+  margin: 2px;
 }
 
 a:hover {
@@ -66,7 +68,7 @@ a:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 5px 0;
+  margin: 2px 0;
 }
 
 .indicator {
@@ -74,15 +76,15 @@ a:hover {
 }
 
 .recording-indicator {
-  width: 25px;
-  height: 25px;
+  width: 23px;
+  height: 23px;
   background-color: red;
   border-radius: 50%;
 }
 
 .idle-indicator {
-  width: 23px;
-  height: 23px;
+  width: 21px;
+  height: 21px;
   background-color: grey;
   border-radius: 50%;
 }
@@ -93,7 +95,7 @@ a:hover {
   justify-content: center; /* Centers horizontally */
   align-items: center; /* Centers vertically */
  
-  margin: 10px 0; /* Maintains spacing around the container */
+  margin: 0; /* Maintains spacing around the container */
 }
 
   /* Image specific styling */
@@ -108,8 +110,8 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 5px;
-    margin-bottom: 10px;
+    margin-top: 0px;
+    margin-bottom: 5px;
     position: relative;
     height: 15px; /* Adjust height for better visibility of ticks */
   }
@@ -163,3 +165,61 @@ a:hover {
   .waveform-out {
     margin-top: 5px; /* Adjust spacing between timeline and second waveform */
   }
+
+/* Control Wrapper */
+.control-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 2px;
+}
+
+/* Indicator Wrapper */
+.indicator-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Guide Number */
+.guide-number {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: rgba(0, 0, 0, 0.479);
+  color: white;
+  border: 2px solid rgb(255, 0, 0);
+  padding: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 10;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  background-color: #000000;
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
+  white-space: pre-wrap;
+  width: 250px;
+  z-index: 2020;
+  font-size: 12px;
+  overflow-y: auto; /* Enable vertical scrolling if needed */
+  max-height: 400px; /* Optional default max height */
+}
+
+
+.backend-status {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.backend-status a {
+  color: #b42020;
+  text-decoration: none;
+}
+
+.backend-status a:hover {
+  text-decoration: underline;
+}
