@@ -223,3 +223,94 @@ a:hover {
 .backend-status a:hover {
   text-decoration: underline;
 }
+
+.gary-toggle-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 2px;
+  margin-left: 15px; /* Add extra space to the left */
+}
+
+/* Style for the toggle button itself */
+.gary-toggle {
+  border: 1px solid red;  /* Match your existing button style */
+  background-color: black;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+/* Style for when Gary is tamed */
+.gary-toggle.active {
+  background-color: #b42020;  /* Match your link hover color */
+  color: white;
+}
+
+.top-row {
+  display: flex;
+  justify-content: flex-start; /* Changed from space-between to align left */
+  align-items: center;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.left-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px; /* Reduced gap to bring fix_toggle closer to indicator */
+}
+
+.gary-toggle-wrapper {
+  margin-left: 8px; /* Reduced margin to bring tame gary closer */
+}
+
+/* Transform buttons group */
+.transform-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto; /* This pushes it to the right */
+  position: relative; /* Add this */
+}
+
+/* Add these new classes */
+.transform-button,
+.undo-transform-button,
+.reset-transform-button {
+  position: relative; /* Add this */
+}
+
+.transform-button .guide-number,
+.undo-transform-button .guide-number,
+.reset-transform-button .guide-number {
+  top: -25px;  /* Adjust as needed */
+  right: -10px;
+}
+
+/* Progress and variation select row */
+.progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 5px;
+}
+
+/* Style the dropdown differently */
+.variation-select {
+  background-color: #b42020; /* Solid red background */
+  color: white;
+  border: 1px solid red;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-family: 'Agency FB';
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.variation-select:hover {
+  background-color: #d42525; /* Slightly lighter red on hover */
+}
+
+.transform-button {
+  border: 1px solid red;  /* Match your existing button style */
+}
