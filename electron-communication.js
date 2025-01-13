@@ -5,11 +5,125 @@ const ffmpeg = require('fluent-ffmpeg');
 
 const ws = new WebSocket('ws://localhost:8080');
 
+let lastErrorMessage = null;  // Track the last error message
+
+// Define our variations array in the same order as the Max umenu
+const VARIATIONS = [
+  'accordion_folk',
+  'banjo_bluegrass',
+  'piano_classical',
+  'celtic',
+  'strings_quartet',
+  'synth_retro',
+  'synth_modern',
+  'synth_edm',
+  'lofi_chill',
+  'synth_bass',
+  'rock_band',
+  'cinematic_epic',
+  'retro_rpg',
+  'chiptune',
+  'steel_drums',
+  'gamelan_fusion',
+
+  
+  // ... all other variations in the same order as Max umenu
+];
+
 ws.on('open', function open() {
   Max.post("Connected to Electron WebSocket server");
 });
 
 ws.on('close', () => Max.post("Disconnected from Electron WebSocket server"));
+
+Max.addHandler('reconnect', () => {
+  lastErrorMessage = null;  // Clear any stored error message
+  if (ws.readyState === WebSocket.OPEN) {
+    // Only send the connection status
+    ws.send(JSON.stringify({
+      action: 'backend_connection_status',
+      data: true
+    }));
+    Max.post('Sent reconnection status to WebSocket server');
+  }
+});
+
+Max.addHandler('backend_connection', (...args) => {
+  
+  Max.post('Full backend_connection message data:');
+  Max.post(JSON.stringify({
+    args: args,
+    firstArg: args[0],
+    type: typeof args[0]
+  }));
+  
+  if (ws.readyState === WebSocket.OPEN) {
+    // Now we can properly check the value we receive
+    const status = args[0] === 1;
+    
+    ws.send(JSON.stringify({
+      action: 'backend_connection_status',
+      data: status
+    }));
+    Max.post(`Sent backend connection status to WebSocket server: ${status}`);
+  }
+});
+
+Max.addHandler('error_message', (data) => {
+  // Store this error message
+  lastErrorMessage = data;
+  
+  if (ws.readyState === WebSocket.OPEN) {
+    const [type, message] = data.split('|');
+    
+    ws.send(JSON.stringify({
+      action: 'error_message',
+      data: {
+        type,
+        message
+      }
+    }));
+    Max.post(`Sent error message to WebSocket server - Type: ${type}, Message: ${message}`);
+  }
+});
+
+// Handler for receiving variation changes from Max
+Max.addHandler('set_variation', (value) => {
+  if (ws.readyState === WebSocket.OPEN) {
+    // If value is a number (index)
+    if (typeof value === 'number') {
+      const variationName = VARIATIONS[value];
+      if (variationName) {
+        ws.send(JSON.stringify({
+          action: 'update_variation',
+          data: variationName
+        }));
+        Max.post(`Sent variation update to WebSocket server: ${variationName}`);
+      } else {
+        Max.post(`Invalid variation index: ${value}`);
+      }
+    }
+    // If value is a string (variation name)
+    else if (typeof value === 'string') {
+      if (VARIATIONS.includes(value)) {
+        ws.send(JSON.stringify({
+          action: 'update_variation',
+          data: value
+        }));
+        Max.post(`Sent variation update to WebSocket server: ${value}`);
+      } else {
+        Max.post(`Invalid variation name: ${value}`);
+      }
+    }
+  }
+});
+
+Max.addHandler('tame_gary', (value) => {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ garyToggle: value }));
+    Max.post(`Sent Gary state to WebSocket server: ${value}`);
+  }
+});
 
 // Max handler to forward progress updates to the Electron app
 Max.addHandler('progress_update', (progress) => {
@@ -90,10 +204,27 @@ ws.on('message', function incoming(data) {
         Max.outlet('write_buffer');
         setTimeout(() => sendAudioData('C:\\g4l\\myBuffer.wav', 'audio_data_buffer'), 1000);
         break;
-      case 'load_output':
-        Max.outlet('replace_output'); // Outlet that triggers 'replace C:/g4l/myOutput.wav'
-        sendAudioData('C:\\g4l\\myOutput.wav', 'audio_data_output');
-        break;
+        case 'load_output':
+          // First pause any ongoing playback
+          Max.outlet('pause');
+          // Wait a brief moment for pause to take effect
+          setTimeout(() => {
+            // Reset the playback position
+            Max.outlet('reset');
+            // Replace the audio file
+            Max.outlet('replace_output');
+            // Send the audio data back to Electron
+            sendAudioData('C:\\g4l\\myOutput.wav', 'audio_data_output');
+            // Notify Electron that we've reset the playback state
+            ws.send(JSON.stringify({
+              action: 'playback_state_update',
+              data: {
+                isPlaying: false,
+                position: 0
+              }
+            }));
+          }, 100);
+          break;
       case 'play':
         Max.outlet('play');  // Assumes there's a Max outlet configured to handle this
         break;
@@ -126,6 +257,48 @@ ws.on('message', function incoming(data) {
       case 'crop':
         const { data } = command;
         handleCropAudio(data);
+        break;
+      case 'update_gary_state':
+        const garyState = command.data.garyToggle;
+        Max.outlet('update_gary_state', garyState); // This will connect to a route object in Max
+        break;
+      // When receiving variation updates from Electron
+      case 'update_variation':
+        // Find the index of the variation in our array
+        const index = VARIATIONS.indexOf(command.data);
+        if (index !== -1) {
+          Max.outlet('update_variation', index);  // Send the index instead of the string
+        }
+        break;
+      case 'transform':
+        Max.outlet('transform');
+        break;
+      case 'undo_transform':
+        Max.outlet('undo_transform');
+        break;
+      case 'reset_transform':
+          Max.outlet('reset_transform');
+          // Then handle the syncing of current state
+          if (command.data && typeof command.data === 'object') {
+            // Update model path if provided
+            if (command.data.modelPath) {
+              Max.outlet('forward_model_path', command.data.modelPath);
+            }
+            // Update prompt duration if provided
+            if (command.data.promptDuration) {
+              Max.outlet('update_prompt_duration', command.data.promptDuration);
+            }
+            // Update variation if provided
+            if (command.data.variation) {
+              const index = VARIATIONS.indexOf(command.data.variation);
+              if (index !== -1) {
+                Max.outlet('update_variation', index);
+              }
+            }
+          }
+        break;
+        case 'backend_connection_status':
+          Max.outlet('backend_connection_status', command.data);
         break;
       default:
         Max.post(`Unhandled action: ${command.action}`);

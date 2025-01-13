@@ -1,7 +1,10 @@
 const Max = require('max-api');
 const fs = require('fs');
 const io = require('socket.io-client');
-const socket = io('https://g4l.thecollabagepatch.com', {
+const socket = io('http://localhost:8000', {
+
+    // our backend url
+// const socket = io('https://g4l.thecollabagepatch.com', {
     transports: ['websocket'], // Force WebSocket usage
     reconnection: true, // Enable auto-reconnection
     reconnectionAttempts: Infinity, // Unlimited reconnection attempts
@@ -18,6 +21,75 @@ let modelPath = 'thepatch/vanya_ai_dnb_0.1'; // Default model path
 let sessionID = null; // Variable to store the session ID
 let isProcessing = false;
 let promptDuration = 6; // Default prompt duration
+let tameTheGaryEnabled = false; // New state variable for the toggle
+let variationName = 'accordion_folk';  // Default variation
+
+let isBackendConnected = false;
+
+// Add handler for variation text input
+Max.addHandler('set_variation', (newVariation) => {
+    if (typeof newVariation === 'string') {
+        variationName = newVariation.trim();
+        Max.post(`Variation updated to: ${variationName}`);
+    }
+});
+
+// Update transform handler to use the variationName variable
+Max.addHandler('transform', () => {
+    if (!isProcessing) {
+        isProcessing = true;
+        
+        const audioPath = sessionID ? 'C:/g4l/myOutput.wav' : 'C:/g4l/myBuffer.wav';
+        
+        fs.readFile(audioPath, (err, data) => {
+            if (err) {
+                Max.post(`Error reading audio file: ${err}`);
+                isProcessing = false;
+                return;
+            }
+            
+            const audioData_base64 = data.toString('base64');
+            
+            const request = {
+                audio_data: audioData_base64,
+                variation: variationName,  // Use the stored variation name
+                session_id: sessionID
+            };
+
+            socket.emit('transform_audio_request', request);
+        });
+
+        setTimeout(() => {
+            isProcessing = false;
+        }, timeoutDuration);
+    } else {
+        Max.post('Processing already in progress.');
+    }
+});
+
+// Add handler for undo button
+Max.addHandler('undo_transform', () => {
+    if (!isProcessing && sessionID) {
+        isProcessing = true;
+        
+        const request = {
+            session_id: sessionID
+        };
+
+        socket.emit('undo_transform_request', request);
+
+        setTimeout(() => {
+            isProcessing = false;
+        }, timeoutDuration);
+    } else {
+        Max.post('Either processing in progress or no session available for undo.');
+    }
+});
+
+Max.addHandler('tame_gary', (value) => {
+    tameTheGaryEnabled = value === 1;
+    Max.post(`Tame the Gary ${tameTheGaryEnabled ? 'enabled' : 'disabled'}`);
+});
 
 // Timeout duration in milliseconds
 const timeoutDuration = 500; // .5 seconds
@@ -25,7 +97,9 @@ const timeoutDuration = 500; // .5 seconds
 // Initialize WebSocket connection and setup event listeners
 function initSocketConnection() {
     socket.on('connect', () => {
+        isBackendConnected = true;
         Max.post('Connected to WebSocket server.');
+        Max.outlet('backend_connection', true);
         if (sessionID) {
             socket.emit('verify_session', { session_id: sessionID });
         }
@@ -35,8 +109,11 @@ function initSocketConnection() {
         Max.post('Attempting to reconnect to WebSocket server...');
     });
 
-    socket.on('reconnect', () => {
-        Max.post('Successfully reconnected to WebSocket server.');
+    Max.addHandler('reconnect', () => {
+        // Only send the connection status
+        Max.outlet('backend_connection', true);
+        // Reset any error states if needed
+        Max.post('Reconnected and reset states');
     });
 
     socket.on('reconnect_error', (error) => {
@@ -48,13 +125,17 @@ function initSocketConnection() {
     });
 
     socket.on('connect_error', (error) => {
+        isBackendConnected = false;
         Max.post('Connection error: ' + error.message);
+        Max.outlet('backend_connection', false);  // Inform about lost backend connection
     });
 
     socket.on('disconnect', (reason) => {
+        isBackendConnected = false;
         Max.post('Disconnected from WebSocket server: ' + reason);
+        Max.outlet('backend_connection', false);  // Inform about lost backend connection
         if (reason === 'io server disconnect') {
-            socket.connect();  // Optionally try to reconnect automatically
+            socket.connect();
         }
     });
 
@@ -93,14 +174,41 @@ function initSocketConnection() {
     });
 
     socket.on('error', (data) => {
-        isProcessing = false; // Reset flag if an error occurs
+        isProcessing = false;
         Max.post('Error from WebSocket server: ' + data.message);
-        Max.outlet('error', data.message);
+        
+        // Check if the error message includes the specific connection error
+        if (data.message.includes('Connection refused') || 
+            data.message.includes('Failed to establish a new connection')) {
+            Max.outlet('error_message', 'transform|terry is asleep right now. he uses alot of gpu ram. you can learn how to spin up your own terry container by bugging kevin in the discord tho: https://discord.gg/VECkyXEnAd');
+        } else {
+            Max.outlet('error', data.message);
+        }
     });
 
     socket.on('update_cropped_audio_complete', (data) => {
         sessionID = data.session_id; // Update the session ID
         Max.post('Cropped audio updated successfully.');
+    });
+
+    // Add new socket listener for transform response
+    socket.on('audio_transformed', (data) => {
+        isProcessing = false;
+        Max.post('Audio transformation successful.');
+        sessionID = data.session_id; // Update session ID
+        const outputBuffer = Buffer.from(data.audio_data, 'base64');
+        fs.writeFileSync('C:/g4l/myOutput.wav', outputBuffer);
+        Max.outlet('audio_transformed');
+        // Max.outlet('progress_update', 100);
+    });
+    // Add socket listener for undo response
+    socket.on('transform_undone', (data) => {
+        isProcessing = false;
+        Max.post('Transform undo successful.');
+        sessionID = data.session_id;
+        const outputBuffer = Buffer.from(data.audio_data, 'base64');
+        fs.writeFileSync('C:/g4l/myOutput.wav', outputBuffer);
+        Max.outlet('transform_undone');
     });
 }
 
@@ -128,32 +236,62 @@ Max.addHandler('bang', () => {
 
 // Function to handle 'continue' message from Max
 Max.addHandler('continue', () => {
-    if (!isProcessing && sessionID) {
-        isProcessing = true;
-        continueMusic();
-
-        // Add timeout to reset isProcessing
-        setTimeout(() => {
-            isProcessing = false;
-        }, timeoutDuration);
-    } else {
-        Max.post('Either processing already in progress or no session available.');
+    if (isProcessing) {
+        Max.outlet('error_message', 'processing', 'Still processing previous request, wait a sec...');
+        Max.post('Processing already in progress.');
+        return;
     }
+    
+    if (!sessionID) {
+        // Let's try concatenating the type and message with a delimiter
+        Max.outlet('error_message', 'no_session|no audio in the session to continue yet, homie. press bang first.');
+        Max.post('No session available - need to press bang first.');
+        return;
+    }
+
+    isProcessing = true;
+    continueMusic();
+
+    setTimeout(() => {
+        isProcessing = false;
+    }, timeoutDuration);
 });
 
 // Function to handle 'retry' message from Max
 Max.addHandler('retry', () => {
-    if (!isProcessing && sessionID) {
-        isProcessing = true;
-        socket.emit('retry_music_request', { session_id: sessionID, model_name: modelPath, prompt_duration: promptDuration });
-
-        // Add timeout to reset isProcessing
-        setTimeout(() => {
-            isProcessing = false;
-        }, timeoutDuration);
-    } else {
-        Max.post('Either processing already in progress or no session available.');
+    if (isProcessing) {
+        Max.outlet('error_message', 'processing|Still processing previous request, wait a sec...');
+        Max.post('Processing already in progress.');
+        return;
     }
+    
+    if (!sessionID) {
+        // Using the same delimiter format as continue
+        Max.outlet('error_message', 'no_continuation|no continued audio to retry bro. press continue first.');
+        Max.post('No continued audio available - need to press continue first.');
+        return;
+    }
+
+    isProcessing = true;
+    
+    const request = {
+        session_id: sessionID,
+        model_name: modelPath,
+        prompt_duration: promptDuration
+    };
+
+    // Add Gary-taming parameters if enabled
+    if (tameTheGaryEnabled) {
+        request.top_k = 150;
+        request.cfg_coef = 5;
+        request.description = "drums, percussion";
+    }
+
+    socket.emit('retry_music_request', request);
+
+    setTimeout(() => {
+        isProcessing = false;
+    }, timeoutDuration);
 });
 
 // This handler will directly update the model path when text changes
@@ -188,6 +326,22 @@ Max.addHandler('crop_audio', () => {
     });
 });
 
+// Add handler for reset_transform
+Max.addHandler('reset_transform', () => {
+    Max.post('[commentedout] Reset transform handler triggered');
+    
+    // If we have an active session, clean it up
+    if (sessionID) {
+        Max.post('[commentedout] Cleaning up session: ' + sessionID);
+        socket.emit('cleanup_session_request', { session_id: sessionID });
+        sessionID = null;
+    } else {
+        Max.post('[commentedout] No active session to clean up');
+    }
+    
+    Max.post('[commentedout] Reset complete');
+});
+
 // Function to process audio
 function processAudio(inputAudioPath) {
     fs.readFile(inputAudioPath, (err, data) => {
@@ -198,11 +352,22 @@ function processAudio(inputAudioPath) {
             return;
         }
         const audioData_base64 = data.toString('base64');
-        socket.emit('process_audio_request', {
+        
+        // Base request object
+        const request = {
             audio_data: audioData_base64,
             model_name: modelPath,
-            prompt_duration: promptDuration // Include prompt duration
-        });
+            prompt_duration: promptDuration
+        };
+
+        // Add Gary-taming parameters if enabled
+        if (tameTheGaryEnabled) {
+            request.top_k = 100;
+            request.cfg_coef = 5;
+            request.description = "drums, percussion";
+        }
+
+        socket.emit('process_audio_request', request);
     });
 }
 
@@ -217,7 +382,23 @@ function continueMusic() {
             return;
         }
         const audioData_base64 = data.toString('base64');
-        socket.emit('continue_music_request', { audio_data: audioData_base64, model_name: modelPath, session_id: sessionID, prompt_duration: promptDuration });
+        
+        // Base request object
+        const request = {
+            audio_data: audioData_base64,
+            model_name: modelPath,
+            session_id: sessionID,
+            prompt_duration: promptDuration
+        };
+
+        // Add Gary-taming parameters if enabled
+        if (tameTheGaryEnabled) {
+            request.top_k = 150;
+            request.cfg_coef = 5;
+            request.description = "drums, percussion";
+        }
+
+        socket.emit('continue_music_request', request);
     });
 }
 

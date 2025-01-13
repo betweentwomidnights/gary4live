@@ -6,3 +6,13 @@ g4l-ui/node_modules/
 *.wav.asd
 *.log
 node-v20.13.1-x64.msi
+commentedout_backup.js
+commentedout_websockets_backup.js
+myBufferUI.js
+update_path.bat
+waveform.js
+recordtoggle.js
+package-lock.json
+commentedout_test.js
+g4l-ui/package-lock.json
+g4l-ui/release/build/

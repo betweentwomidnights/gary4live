@@ -1,14 +1,31 @@
 # gary4live
 
-this is gary4live. there is an installer for pc as well as for mac, but if you would rather build it yourself, it's really easy.
+this is gary4live. gary iterates on input audio using max for live and musicgen.
+
+ there is an installer for pc as well as for mac, but if you would rather build it yourself, it's really easy.
+
+## update jan 12 2025
+### gary's now got a lil buddy inside him...terry
+
+![gary4live](./gary4live%20screenshot.png)
+
+meta's new melodyflow model (terry) can be used inside this device now to transform input audio. it generates audio the same length as the input. you can have terry transform your recorded buffer or the outputs gary gives back (up to ~40 secs). terry's got 'presets' you can choose from.
+
+https://huggingface.co/spaces/facebook/melodyflow (you can play with terry here too)
 
 this repo was designed for the root directory to be placed in C:\\g4l for maximum simplicity. dynamic filepaths are a pain in the ass in the max for live gui. sry.
 
 these paths can be changed with some effort (more instructions at the bottom)
 
-you'll need to install node and npm first. it's not too bad.
+you'll need to install node first. it's not too bad.
 
-![gary4live](./gary4live%20screenshot.png)
+https://nodejs.org/en/download/
+
+ffmpeg is needed for cropping to work. it can be a littler harder to install on windows. you may have to update your environment variables. ask claude (lol)
+
+https://ffmpeg.org/download.html
+
+
 
 clone this repository:
 
@@ -61,10 +78,12 @@ do NOT:
 - drag them into the ableton timeline.
 - manually change myBuffer.wav to a 6 minute audio file. it should only be changed by our write function and should be a maximum of 30 seconds.
 
-there is a separate repository kev still needs to push that is specific to mac users. (https://github.com/betweentwomidnights/gary-mac)
+if you rly wanna learn how to use this thing, head to discord https://discord.gg/VECkyXEnAd and yell at me, or go to https://youtube.com/@thepatch_dev
+
+there is a separate repository for the mac front-end (https://github.com/betweentwomidnights/gary-mac)
 
 demo of the device being used here:
 
-[![demo video](https://img.youtube.com/vi/ZqgcRiAlrHQ/0.jpg)](https://youtu.be/ZqgcRiAlrHQ)
+[![demo video](https://img.youtube.com/vi/ZqgcRiAlrHQ/0.jpg)](https://www.youtube.com/watch?v=0plq4OV0ECY)
 
 the backend for this device can be run locally using docker-compose. (https://github.com/betweentwomidnights/gary-backend-combined)
