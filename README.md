@@ -4,10 +4,14 @@ this is gary4live. gary iterates on input audio using max for live and musicgen.
 
  there is an installer for pc as well as for mac, but if you would rather build it yourself, it's really easy.
 
-## update jan 12 2025
-### gary's now got a lil buddy inside him...terry
+## update july_2_2025
+### gary's now got two lil buddies lol...jerry and terry
 
-![gary4live](./gary4live%20screenshot.png)
+![gary4live](./gary4live_screenshot.png)
+
+jerry is just our nickname for the stable-audio-open-small model. it generates 12 seconds of audio in under a second when using a gpu. it makes great input audio for gary's continuations. 
+
+https://huggingface.co/stabilityai/stable-audio-open-small 
 
 meta's new melodyflow model (terry) can be used inside this device now to transform input audio. it generates audio the same length as the input. you can have terry transform your recorded buffer or the outputs gary gives back (up to ~40 secs). terry's got 'presets' you can choose from.
 
@@ -21,7 +25,7 @@ you'll need to install node first. it's not too bad.
 
 https://nodejs.org/en/download/
 
-ffmpeg is needed for cropping to work. it can be a littler harder to install on windows. you may have to update your environment variables. ask claude (lol)
+ffmpeg is needed for cropping to work. it can be a little harder to install on windows. you may have to update your environment variables. ask claude (lol)
 
 https://ffmpeg.org/download.html
 
