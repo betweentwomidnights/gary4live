@@ -31,21 +31,25 @@ const GuideNumber: React.FC<GuideNumberProps> = ({ number, blurb, isTransformBut
 
                 // Special handling for transform buttons
                 if (isTransformButton) {
-                    tooltip.style.right = '100%';  // Position to the left of the guide number
-                    tooltip.style.left = 'auto';
-                    tooltip.style.marginRight = '10px';  // Add some spacing
-                    
-                    // Calculate vertical position
-                    const spaceAbove = guideNumberRect ? guideNumberRect.top : 0;
-                    const spaceBelow = guideNumberRect
-                        ? window.innerHeight - guideNumberRect.bottom
-                        : 0;
-
-                    if (spaceBelow >= tooltipRect.height) {
-                        tooltip.style.top = '0';
-                    } else {
-                        tooltip.style.bottom = '0';
-                    }
+                  // Position the guide number to the left of the button
+                  tooltip.style.right = 'calc(100% + 10px)';  // Position left with spacing
+                  tooltip.style.left = 'auto';
+                  tooltip.style.transform = 'none';  // Remove any previous transforms
+                  
+                  // Vertical centering
+                  if (guideNumberRect) {
+                      const buttonHeight = guideNumberRect.height;
+                      const tooltipHeight = tooltipRect.height;
+                      tooltip.style.top = `${(buttonHeight - tooltipHeight) / 2}px`;
+                  }
+                  
+                  // Ensure tooltip doesn't go off screen to the left
+                  const leftEdge = tooltipRect.left;
+                  if (leftEdge < 0) {
+                      tooltip.style.right = 'auto';
+                      tooltip.style.left = '-10px';  // Small negative offset to avoid button overlap
+                  }
+              
                   } else if (isBottomButton) {
                     // Force tooltip to appear above the guide number
                     tooltip.style.bottom = '100%';

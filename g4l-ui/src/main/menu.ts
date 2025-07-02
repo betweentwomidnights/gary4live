@@ -156,7 +156,7 @@ export default class MenuBuilder {
       label: 'Help',
       submenu: [
         {
-          label: 'Show Guide',
+          label: 'show guide',
           type: 'checkbox',
           checked: false,
           click: (menuItem) => {
@@ -171,7 +171,7 @@ export default class MenuBuilder {
           },
         },
         {
-          label: 'Documentation',
+          label: 'github',
           click() {
             shell.openExternal(
               'https://github.com/betweentwomidnights/gary4live',
@@ -179,17 +179,17 @@ export default class MenuBuilder {
           },
         },
         {
-          label: 'community - musicgen discord',
+          label: 'community - discord',
           click() {
-            shell.openExternal('https://discord.gg/4eyZcZcV');
+            shell.openExternal('https://discord.gg/VECkyXEnAd');
           },
         },
-        {
-          label: 'Search Issues',
-          click() {
-            shell.openExternal('https://github.com/electron/electron/issues');
-          },
-        },
+        // {
+        //   label: 'Search Issues',
+        //   click() {
+        //     shell.openExternal('https://github.com/electron/electron/issues');
+        //   },
+        // },
       ],
     };
 
@@ -266,7 +266,7 @@ export default class MenuBuilder {
         label: 'Help',
         submenu: [
           {
-            label: 'Show Guide',
+            label: 'show guide',
             type: 'checkbox',
             checked: false,
             click: (
@@ -285,7 +285,7 @@ export default class MenuBuilder {
             },
           },
           {
-            label: 'docs',
+            label: 'github',
             click() {
               shell.openExternal(
                 'https://github.com/betweentwomidnights/gary4live',
@@ -295,15 +295,15 @@ export default class MenuBuilder {
           {
             label: 'community - discord',
             click() {
-              shell.openExternal('https://discord.gg/4eyZcZcV');
+              shell.openExternal('https://discord.gg/VECkyXEnAd');
             },
           },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/electron/electron/issues');
-            },
-          },
+          // {
+          //   label: 'Search Issues',
+          //   click() {
+          //     shell.openExternal('https://github.com/electron/electron/issues');
+          //   },
+          // },
         ],
       },
     ];

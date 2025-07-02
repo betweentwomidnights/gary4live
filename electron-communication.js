@@ -2,10 +2,53 @@ const Max = require('max-api');
 const WebSocket = require('ws');
 const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
+const path = require('path');
+const { execSync } = require('child_process');
+
+function checkFfmpegInPath() {
+  try {
+    // Try to execute ffmpeg -version
+    execSync('ffmpeg -version', { stdio: 'ignore' });
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function setupFfmpegPath() {
+  // First check if ffmpeg is already accessible in PATH
+  if (checkFfmpegInPath()) {
+    Max.post('FFmpeg found in PATH, using system FFmpeg');
+    return;
+  }
+
+  // If not in PATH, set explicit path to our bundled ffmpeg
+  try {
+    const ffmpegPath = path.join(__dirname, 'ffmpeg', 'ffmpeg.exe');
+    ffmpeg.setFfmpegPath(ffmpegPath);
+    
+    // Verify our explicit path works
+    const testCmd = new ffmpeg();
+    testCmd._getFfmpegPath((err, path) => {
+      if (err) {
+        Max.post(`Error verifying FFmpeg path: ${err.message}`);
+      } else {
+        Max.post(`Successfully set FFmpeg path to: ${path}`);
+      }
+    });
+  } catch (error) {
+    Max.post(`Error setting FFmpeg path: ${error.message}`);
+    // You might want to throw the error here depending on how critical FFmpeg is to your application
+  }
+}
+
+// Call this function when initializing your application
+setupFfmpegPath();
 
 const ws = new WebSocket('ws://localhost:8080');
 
 let lastErrorMessage = null;  // Track the last error message
+let isProcessing = false;
 
 // Define our variations array in the same order as the Max umenu
 const VARIATIONS = [
@@ -25,6 +68,23 @@ const VARIATIONS = [
   'chiptune',
   'steel_drums',
   'gamelan_fusion',
+  'music_box',
+  'trap_808',
+  'lo_fi_drums',
+  'boom_bap',
+  'percussion_ensemble',
+  'future_bass',
+  'synthwave_retro',
+  'melodic_techno',
+  'dubstep_wobble',
+  'glitch_hop',
+  'digital_disruption',
+  'circuit_bent',
+  'orchestral_glitch',
+  'vapor_drums',
+  'industrial_textures',
+  'jungle_breaks',
+
 
   
   // ... all other variations in the same order as Max umenu
@@ -35,6 +95,16 @@ ws.on('open', function open() {
 });
 
 ws.on('close', () => Max.post("Disconnected from Electron WebSocket server"));
+
+Max.addHandler('set_flowstep', (value) => {
+  if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({
+          action: 'update_flowstep',
+          data: value
+      }));
+      Max.post(`Sent flowstep update to WebSocket server: ${value}`);
+  }
+});
 
 Max.addHandler('reconnect', () => {
   lastErrorMessage = null;  // Clear any stored error message
@@ -161,27 +231,57 @@ const handleCropAudio = (end) => {
   const tempFilePath = 'C:/g4l/tempAudio.wav';
   const croppedFilePath = 'C:/g4l/myOutput.wav';
 
-  fs.copyFileSync('C:/g4l/myOutput.wav', tempFilePath); // Copy the original file to tempFilePath
+  
 
-  ffmpeg(tempFilePath)
-    .setStartTime(0)
-    .setDuration(Number(end)) // Ensure end is a number
-    .output(croppedFilePath)
-    .on('start', (cmdline) => {
-      Max.post(`Started ffmpeg with command: ${cmdline}`);
-    })
-    .on('end', () => {
-      Max.post('Audio cropping successful.');
-      fs.unlinkSync(tempFilePath);
-      sendAudioData(croppedFilePath, 'audio_data_output');  // Send the updated audio data back to Electron
-      Max.outlet('crop_audio', 'success');  // Explicitly send a message indicating crop success
-    })
-    .on('error', (err) => {
-      Max.post('Error cropping audio: ' + err.message);
-      fs.unlinkSync(tempFilePath);
-      Max.outlet('crop_audio', 'error');
-    })
-    .run();
+  try {
+    fs.copyFileSync('C:/g4l/myOutput.wav', tempFilePath); // Copy the original file to tempFilePath
+
+    ffmpeg(tempFilePath)
+      .setStartTime(0)
+      .setDuration(Number(end))
+      .output(croppedFilePath)
+      .on('start', (cmdline) => {
+        Max.post(`Started ffmpeg with command: ${cmdline}`);
+      })
+      .on('end', () => {
+        Max.post('Audio cropping successful.');
+        fs.unlinkSync(tempFilePath);
+        
+        // First, notify Max that crop was successful
+        Max.outlet('crop_audio', 'success');
+        
+        // Then trigger the replace_output
+        Max.outlet('replace_output');
+        
+        // Finally, send the new audio data back to Electron
+        sendAudioData(croppedFilePath, 'audio_data_output');
+        
+        // Reset processing flag
+        isProcessing = false;
+      })
+      .on('error', (err) => {
+        Max.post('Error cropping audio: ' + err.message);
+        fs.unlinkSync(tempFilePath);
+        Max.outlet('crop_audio', 'error');
+        isProcessing = false;
+        
+        // Notify Electron of the error
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            action: 'error_message',
+            data: {
+              type: 'crop',
+              message: 'Failed to crop audio: ' + err.message
+            }
+          }));
+        }
+      })
+      .run();
+  } catch (error) {
+    Max.post('Error in crop operation: ' + error.message);
+    isProcessing = false;
+    Max.outlet('crop_audio', 'error');
+  }
 };
 
 // Function to handle 'crop' message from Max
@@ -192,6 +292,60 @@ Max.addHandler('crop', (end) => {
     Max.post(`Sent crop action with end: ${end}`);
   } else {
     Max.post('Processing already in progress.');
+  }
+});
+
+Max.addHandler('audio_processed', () => {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({
+      action: 'audio_processed'
+    }));
+    Max.post('Sent audio_processed to WebSocket server');
+  }
+});
+
+Max.addHandler('music_continued', () => {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({
+      action: 'music_continued'
+    }));
+    Max.post('Sent music_continued to WebSocket server');
+  }
+});
+
+Max.addHandler('music_retried', () => {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({
+      action: 'music_retried'
+    }));
+    Max.post('Sent music_retried to WebSocket server');
+  }
+});
+
+Max.addHandler('audio_transformed', () => {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({
+      action: 'audio_transformed'
+    }));
+    Max.post('Sent audio_transformed to WebSocket server');
+  }
+});
+
+Max.addHandler('update_cropped_audio_complete', () => {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({
+      action: 'update_cropped_audio_complete'
+    }));
+    Max.post('Sent update_cropped_audio_complete to WebSocket server');
+  }
+});
+
+Max.addHandler('stable_audio_generated', () => {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({
+      action: 'stable_audio_generated'
+    }));
+    Max.post('Sent stable_audio_generated to WebSocket server');
   }
 });
 
@@ -299,6 +453,30 @@ ws.on('message', function incoming(data) {
         break;
         case 'backend_connection_status':
           Max.outlet('backend_connection_status', command.data);
+        break;
+        case 'update_flowstep':
+          console.log('Updating flowstep with:', command.data);
+          Max.outlet('update_flowstep', command.data);  // This will connect to our live.dial
+        break;
+        case 'update_prompt':
+          let cleanData = command.data;
+          if (typeof cleanData === 'string' && cleanData.startsWith('"') && cleanData.endsWith('"')) {
+            cleanData = cleanData.slice(1, -1); // Remove first and last characters
+          }
+          Max.outlet('forward_prompt', cleanData);
+        break;
+        case 'generate_stable_audio':
+          console.log('Triggering stable audio generation');
+          Max.outlet('generate_stable_audio');
+        break;
+        case 'update_jerry_cfg':
+          console.log('Updating Jerry CFG with:', command.data);
+          Max.outlet('forward_jerry_cfg', command.data);
+        break;
+
+        case 'update_jerry_steps':
+          console.log('Updating Jerry steps with:', command.data);
+          Max.outlet('forward_jerry_steps', command.data);
         break;
       default:
         Max.post(`Unhandled action: ${command.action}`);

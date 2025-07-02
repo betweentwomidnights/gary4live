@@ -110,10 +110,13 @@ const NotificationOverlay: React.FC<NotificationOverlayProps> = ({
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            backgroundColor: isError ? '#EF4444' : '#DC2626',
+            backgroundColor: isError ? '#EF4444' : '#DF0000',
             color: 'white',
             padding: '8px 16px',
-            borderRadius: '6px',
+            borderRadius: '20px',
+            borderColor: "white",
+            borderStyle: "solid",    // Add this
+            borderWidth: "2px",      // Add this
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
             zIndex: 1000,
             maxWidth: '300px',

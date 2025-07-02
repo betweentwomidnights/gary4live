@@ -25,6 +25,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-x: hidden;  /* Prevent horizontal scrolling */
+  overflow-y: hidden;
 }
 
 button {
@@ -68,7 +70,7 @@ a:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 2px 0;
+  margin: 1px 0;
 }
 
 .indicator {
@@ -76,8 +78,8 @@ a:hover {
 }
 
 .recording-indicator {
-  width: 23px;
-  height: 23px;
+  width: 21px;
+  height: 21px;
   background-color: red;
   border-radius: 50%;
 }
@@ -91,20 +93,20 @@ a:hover {
 
 /* Container styling for centering */
 .logo {
-  display: flex;
-  justify-content: center; /* Centers horizontally */
-  align-items: center; /* Centers vertically */
- 
-  margin: 0; /* Maintains spacing around the container */
+  position: absolute;  /* Take it out of the normal flow */
+  left: 50%;          /* Center horizontally */
+  transform: translateX(-50%);  /* Offset by its own width */
+  top: 30px;          /* Position from top */
+  margin: 0;
+  z-index: -1;        /* Place behind other elements */
 }
 
-  /* Image specific styling */
-  .logo img {
-    animation: rotate 20s linear infinite; /* Only handle animation here */
-    display: block; /* Ensures proper rendering */
-    max-width: 100%; /* Ensures the image is responsive */
-    height: auto; /* Maintains aspect ratio */
-  }
+.logo img {
+  width: 150px;      /* Set fixed width */
+  height: auto;
+  display: block;
+  animation: rotate 20s linear infinite;
+}
 
   .timeline {
     display: flex;
@@ -177,6 +179,8 @@ a:hover {
 .indicator-wrapper {
   position: relative;
   display: inline-block;
+  margin-top: 70px;
+  z-index: 12000;
 }
 
 /* Guide Number */
@@ -190,7 +194,7 @@ a:hover {
   padding: 5px;
   cursor: pointer;
   font-weight: bold;
-  z-index: 10;
+  z-index: 1000;
 }
 
 /* Tooltip */
@@ -202,9 +206,9 @@ a:hover {
   border-radius: 3px;
   white-space: pre-wrap;
   width: 250px;
-  z-index: 2020;
+  z-index: 4020;
   font-size: 12px;
-  overflow-y: auto; /* Enable vertical scrolling if needed */
+  
   max-height: 400px; /* Optional default max height */
 }
 
@@ -228,7 +232,9 @@ a:hover {
   position: relative;
   display: inline-block;
   margin: 2px;
-  margin-left: 15px; /* Add extra space to the left */
+  margin-left: 2px;  /* Keep the reduced margin from before */
+  margin-right: 0px; /* Add some space to the right but not too much */
+  margin-bottom: -80px;
 }
 
 /* Style for the toggle button itself */
@@ -251,12 +257,13 @@ a:hover {
   align-items: center;
   width: 100%;
   margin-bottom: 10px;
+  margin-top: 40px;
 }
 
 .left-controls {
   display: flex;
   align-items: center;
-  gap: 2px; /* Reduced gap to bring fix_toggle closer to indicator */
+  gap: 0px; /* Reduced gap to bring fix_toggle closer to indicator */
 }
 
 .gary-toggle-wrapper {
@@ -283,7 +290,9 @@ a:hover {
 .undo-transform-button .guide-number,
 .reset-transform-button .guide-number {
   top: -25px;  /* Adjust as needed */
-  right: -10px;
+  right: -20px;
+  margin-right: 20px;
+  z-index: 9000;
 }
 
 /* Progress and variation select row */
@@ -292,7 +301,10 @@ a:hover {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin-top: 5px;
+  margin-top: 5px;  /* Pull it up closer to the top controls */
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
 }
 
 /* Style the dropdown differently */
@@ -300,11 +312,13 @@ a:hover {
   background-color: #b42020; /* Solid red background */
   color: white;
   border: 1px solid red;
-  padding: 4px 8px;
+  padding: 4px 4px;
   border-radius: 5px;
   font-family: 'Agency FB';
   font-size: 1.3rem;
   cursor: pointer;
+  z-index: 1;
+  margin-top: -20px;
 }
 
 .variation-select:hover {
@@ -313,4 +327,327 @@ a:hover {
 
 .transform-button {
   border: 1px solid red;  /* Match your existing button style */
+}
+
+.flowstep-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0rem;
+  width: 100%;
+}
+
+.flowstep-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  background: #444;
+  border-radius: 2px;
+  outline: none;
+  margin: 5px 0;
+}
+
+.flowstep-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff0000;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.flowstep-slider::-webkit-slider-thumb:hover {
+  background: #cc0000;
+}
+
+.flowstep-label {
+  font-size: 0.7rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Ensure transform section maintains position */
+.transform-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: auto;
+  gap: 10px;
+  position: relative; /* Ensure it stays above the logo */
+  z-index: 10000;
+}
+
+.prompt-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 50px;
+  position: absolute;
+}
+
+.prompt-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: bold;
+}
+
+.prompt-input {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+  width: 200px;
+  background: #fff;
+}
+
+.prompt-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
+.generate-button {
+  padding: 6px 12px;
+  background: #ec0000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.generate-button:hover {
+  background: #d40000;
+}
+
+.generate-button:active {
+  background: #eb0800;
+}
+
+.waveform-highlighted {
+  border: 3px solid #ffffff !important;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgb(255, 255, 255);
+  background-color: rgba(0, 123, 255, 0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Optional: Make the transition smoother */
+.waveform, .waveform-out {
+  transition: all 0.2s ease-in-out;
+  border: 3px solid transparent; /* Invisible border to prevent layout shift */
+}
+
+/* Optional: Different colors for top vs bottom */
+.waveform.waveform-highlighted {
+  border-color: #ffbebe; /* Green for input/top */
+  box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.waveform-out.waveform-highlighted {
+  border-color: #f8b9b9; /* Blue for output/bottom */
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+/* Add to your App.css */
+
+.waveform-container {
+  position: relative;
+  /* inherits size from existing waveform */
+}
+
+.recording-progress-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none; /* Don't interfere with waveform interaction */
+  z-index: 2;
+}
+
+.recording-progress-outline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px dashed rgba(255, 0, 0, 0.4); /* Red dotted outline */
+  border-radius: 4px;
+  background: 
+    /* Fake waveform pattern using CSS gradients */
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 8px,
+      rgba(255, 0, 0, 0.1) 8px,
+      rgba(255, 0, 0, 0.1) 12px,
+      transparent 12px,
+      transparent 20px,
+      rgba(255, 0, 0, 0.2) 20px,
+      rgba(255, 0, 0, 0.2) 24px,
+      transparent 24px,
+      transparent 32px,
+      rgba(255, 0, 0, 0.15) 32px,
+      rgba(255, 0, 0, 0.15) 36px,
+      transparent 36px,
+      transparent 44px
+    );
+}
+
+.recording-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: 
+    /* Filled version of the same pattern */
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 8px,
+      rgba(255, 0, 0, 0.3) 8px,
+      rgba(255, 0, 0, 0.3) 12px,
+      transparent 12px,
+      transparent 20px,
+      rgba(255, 0, 0, 0.5) 20px,
+      rgba(255, 0, 0, 0.5) 24px,
+      transparent 24px,
+      transparent 32px,
+      rgba(255, 0, 0, 0.4) 32px,
+      rgba(255, 0, 0, 0.4) 36px,
+      transparent 36px,
+      transparent 44px
+    );
+  border-right: 2px solid rgba(255, 0, 0, 0.8); /* Progress line */
+  transition: width 0.05s linear; /* Smooth fill animation */
+  border-radius: 2px 0 0 2px;
+}
+
+/* Alternative: More waveform-like pattern */
+.recording-progress-fill.waveform-style {
+  background: 
+    /* Simulated waveform peaks and valleys */
+    linear-gradient(180deg, 
+      transparent 0%, 
+      transparent 20%,
+      rgba(255, 0, 0, 0.2) 20%,
+      rgba(255, 0, 0, 0.4) 30%,
+      rgba(255, 0, 0, 0.6) 40%,
+      rgba(255, 0, 0, 0.4) 50%,
+      rgba(255, 0, 0, 0.6) 60%,
+      rgba(255, 0, 0, 0.4) 70%,
+      rgba(255, 0, 0, 0.2) 80%,
+      transparent 80%,
+      transparent 100%
+    ),
+    /* Add horizontal bars to simulate waveform lines */
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 0.1) 0px,
+      rgba(255, 0, 0, 0.1) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+}
+
+/* Pulse animation when recording */
+.recording-progress-overlay.recording {
+  animation: recordingPulse 2s ease-in-out infinite;
+}
+
+@keyframes recordingPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Alternative: Steady glow without pulse (if pulse is too distracting) */
+.save-buffer-button {
+  /* Your existing button styles */
+  transition: all 0.3s ease;
+}
+
+.save-buffer-button.recording-highlight {
+  /* White highlight during recording - STEADY VERSION */
+  border: 2px solid white !important;
+  box-shadow: 
+    0 0 12px rgba(255, 255, 255, 0.7),
+    0 0 24px rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.15);
+  /* No animation for steady glow */
+}
+
+@keyframes saveBufferPulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 10px rgba(255, 255, 255, 0.6),
+      0 0 20px rgba(255, 255, 255, 0.4),
+      inset 0 0 5px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 15px rgba(255, 255, 255, 0.8),
+      0 0 30px rgba(255, 255, 255, 0.6),
+      inset 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* Alternative: Steady glow without pulse (if pulse is too distracting) */
+.save-buffer-button.recording-highlight.steady {
+  border: 2px solid white !important;
+  box-shadow: 
+    0 0 6px rgba(255, 255, 255, 0.7),
+    0 0 12px rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.15);
+  animation: none; /* Remove pulse for steady glow */
+}
+
+.jerry-control-wrapper {
+  position: absolute;
+  display: inline-block;
+  margin: 2px;
+  margin-bottom: 135px;
+  margin-left: 120px;
+}
+
+.jerry-control-wrapper-2 {
+  position: absolute;
+  display: inline-block;
+  margin: 2px;
+  margin-bottom: 135px;
+  margin-left: 172px;
+}
+
+.jerry-input {
+  width: 32px; /* Make them narrow - adjust as needed */
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  height: 6px;
+  font-size: 12px;
+  background: #fff;
+  text-align: center; /* Center the numbers */
+}
+
+.jerry-input:focus {
+  outline: none;
+  border-color: #ff0000;
+  box-shadow: 0 0 3px rgba(110, 0, 0, 0.3);
+}
+
+.jerry-label {
+  font-size: 10px;
+  color: #666;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 4px;
+  width: 32px; /* Match the input width */
 }
