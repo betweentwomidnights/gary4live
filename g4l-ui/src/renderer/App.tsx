@@ -72,6 +72,8 @@ function Hello() {
 
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
+  const isGenerating = loadingAction !== null || (progress > 0 && progress < 100);
+
   const [flowstepValue, setFlowstepValue] = useState(101); // Default to 80 (maps to 0.12)
 
   const [promptText, setPromptText] = useState('aggressive techno');
@@ -614,18 +616,11 @@ const handleFlowstepChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       
       <LoadingIndicator action={loadingAction} />
 
-      {/* Backend Status Blurb */}
-      <div className="backend-status">
-        check whether gary's backend is live{' '}
-        <a
-          href="https://thecollabagepatch.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          here
-        </a>
-        . click 'about that gary tho' at the top.
-      </div>
+      {/* Backend Connection Indicator */}
+<div className={`backend-connection-status ${backendConnection ? 'connected' : 'disconnected'}`}>
+  <div className="connection-dot"></div>
+  <span>{backendConnection ? 'backend connected' : 'backend disconnected'}</span>
+</div>
 
       <div className={`logo ${progress > 0 && progress < 100 ? 'spin' : ''}`}>
         <img width="150" alt="icon" src={icon} />
@@ -689,6 +684,7 @@ const handleFlowstepChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     />
     <button
       type="button"
+      disabled={isGenerating || !backendConnection}
       onClick={() => {
         if (!backendConnection) {
           setErrorMessage({
@@ -793,6 +789,7 @@ const handleFlowstepChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     type="button"
     onMouseEnter={() => handleButtonHover(null, 'transform')}
     onMouseLeave={() => handleButtonHover(null)}
+    disabled={isGenerating || !backendConnection}
     onClick={() => sendToNodeScript({ action: 'transform' })}
     className="transform-button"
 >
@@ -808,6 +805,7 @@ const handleFlowstepChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 
   <button
     type="button"
+    disabled={isGenerating || !backendConnection}
     onClick={() => {
       sendToNodeScript({ action: 'undo_transform' });
       
@@ -829,6 +827,7 @@ const handleFlowstepChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 
   <button
   type="button"
+  disabled={isGenerating || !backendConnection}
   onClick={() => {
         // Clear session state immediately for responsive UI
     setHasActiveSession(false);
@@ -1020,6 +1019,7 @@ const handleFlowstepChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     type="button"
     onMouseEnter={() => handleButtonHover('top')}
     onMouseLeave={() => handleButtonHover(null)}
+    disabled={isGenerating || !backendConnection}
     onClick={() => {
       if (!backendConnection) {
         setErrorMessage({
@@ -1047,6 +1047,7 @@ const handleFlowstepChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     type="button"
     onMouseEnter={() => handleButtonHover('bottom')}
     onMouseLeave={() => handleButtonHover(null)}
+    disabled={isGenerating || !backendConnection}
     onClick={() => {
       if (!backendConnection) {
         setErrorMessage({
@@ -1074,6 +1075,7 @@ const handleFlowstepChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     type="button"
     onMouseEnter={() => handleButtonHover('bottom')}
     onMouseLeave={() => handleButtonHover(null)}
+    disabled={isGenerating || !backendConnection}
     onClick={() => {
       if (!backendConnection) {
         setErrorMessage({
@@ -1134,7 +1136,9 @@ const handleFlowstepChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 
         {/* Crop Button with Guide Number (Step 8) */}
         <div className="control-wrapper">
-          <button type="button" onClick={handleCropAudio}>
+          <button type="button" 
+          disabled={isGenerating || !backendConnection}
+          onClick={handleCropAudio}>
             <FontAwesomeIcon icon={faCut} />
           </button>
           {guideVisible && (
