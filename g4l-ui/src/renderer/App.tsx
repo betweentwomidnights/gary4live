@@ -121,27 +121,27 @@ const [recordingStartTime, setRecordingStartTime] = useState<number | null>(null
 const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
 // 2. ADD EFFECT to handle recording progress animation
+// REPLACE your recording progress useEffect with this:
 useEffect(() => {
   if (isRecording) {
     // Recording just started
-    setRecordingStartTime(Date.now());
+    const startTime = Date.now(); // Use local variable instead
+    setRecordingStartTime(startTime);
     setRecordingProgress(0);
     
     // Start progress animation (30 second duration)
     recordingIntervalRef.current = setInterval(() => {
-      if (recordingStartTime) {
-        const elapsed = Date.now() - recordingStartTime;
-        const progress = Math.min((elapsed / 30000) * 100, 100); // 30 seconds = 100%
-        setRecordingProgress(progress);
-        
-        // Stop at 100%
-        if (progress >= 100) {
-          if (recordingIntervalRef.current) {
-            clearInterval(recordingIntervalRef.current);
-          }
+      const elapsed = Date.now() - startTime; // Use local startTime
+      const progress = Math.min((elapsed / 30000) * 100, 100);
+      setRecordingProgress(progress);
+      
+      // Stop at 100%
+      if (progress >= 100) {
+        if (recordingIntervalRef.current) {
+          clearInterval(recordingIntervalRef.current);
         }
       }
-    }, 50); // Update every 50ms for smooth animation
+    }, 50);
     
   } else {
     // Recording stopped - clear interval but keep progress visible
@@ -158,7 +158,7 @@ useEffect(() => {
       clearInterval(recordingIntervalRef.current);
     }
   };
-}, [isRecording, recordingStartTime]);
+}, [isRecording]); // ← ONLY isRecording in dependencies!
 
 // 3. CREATE RECORDING PROGRESS COMPONENT
 const RecordingProgressWaveform = ({ progress, isVisible }: { progress: number, isVisible: boolean }) => {

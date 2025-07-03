@@ -15,31 +15,80 @@ function checkFfmpegInPath() {
   }
 }
 
+function findFfmpegPath() {
+  // Define all possible FFmpeg locations in order of preference
+  const possiblePaths = [
+    // 1. Natural extraction location (where ffmpeg usually ends up)
+    'C:\\g4l\\ffmpeg\\bin\\ffmpeg.exe',
+    
+    // 2. Manual copy location (current expectation)
+    'C:\\g4l\\ffmpeg\\ffmpeg.exe',
+    
+    // 3. Relative to this script (if bundled with app)
+    path.join(__dirname, 'ffmpeg', 'bin', 'ffmpeg.exe'),
+    path.join(__dirname, 'ffmpeg', 'ffmpeg.exe'),
+    path.join(__dirname, '..', 'ffmpeg', 'bin', 'ffmpeg.exe'),
+    
+    // 4. Common user installation locations
+    'C:\\ffmpeg\\bin\\ffmpeg.exe',
+    'C:\\tools\\ffmpeg\\bin\\ffmpeg.exe',
+    
+    // 5. Program Files locations
+    'C:\\Program Files\\ffmpeg\\bin\\ffmpeg.exe',
+    'C:\\Program Files (x86)\\ffmpeg\\bin\\ffmpeg.exe',
+    
+    // 6. Chocolatey installation
+    'C:\\ProgramData\\chocolatey\\bin\\ffmpeg.exe',
+    'C:\\tools\\ffmpeg\\ffmpeg.exe',
+    
+    // 7. User AppData (winget/scoop installations)
+    path.join(process.env.LOCALAPPDATA || '', 'Microsoft', 'winget', 'Packages', 'Gyan.FFmpeg_Microsoft.Winget.Source*', 'ffmpeg-*', 'bin', 'ffmpeg.exe'),
+  ];
+  
+  // Check each path
+  for (const testPath of possiblePaths) {
+    Max.post(`Checking FFmpeg at: ${testPath}`);
+    
+    if (checkFfmpegAtPath(testPath)) {
+      Max.post(`✅ Found working FFmpeg at: ${testPath}`);
+      return testPath;
+    }
+  }
+  
+  return null;
+}
+
 function setupFfmpegPath() {
+  Max.post('🔍 Searching for FFmpeg...');
+  
   // First check if ffmpeg is already accessible in PATH
   if (checkFfmpegInPath()) {
-    Max.post('FFmpeg found in PATH, using system FFmpeg');
-    return;
+    Max.post('✅ FFmpeg found in system PATH, using system FFmpeg');
+    return true;
   }
-
-  // If not in PATH, set explicit path to our bundled ffmpeg
-  try {
-    const ffmpegPath = path.join(__dirname, 'ffmpeg', 'ffmpeg.exe');
-    ffmpeg.setFfmpegPath(ffmpegPath);
-    
-    // Verify our explicit path works
-    const testCmd = new ffmpeg();
-    testCmd._getFfmpegPath((err, path) => {
-      if (err) {
-        Max.post(`Error verifying FFmpeg path: ${err.message}`);
-      } else {
-        Max.post(`Successfully set FFmpeg path to: ${path}`);
-      }
-    });
-  } catch (error) {
-    Max.post(`Error setting FFmpeg path: ${error.message}`);
-    // You might want to throw the error here depending on how critical FFmpeg is to your application
+  
+  // If not in PATH, search common installation locations
+  const ffmpegPath = findFfmpegPath();
+  
+  if (ffmpegPath) {
+    try {
+      ffmpeg.setFfmpegPath(ffmpegPath);
+      Max.post(`✅ Successfully configured FFmpeg: ${ffmpegPath}`);
+      return true;
+    } catch (error) {
+      Max.post(`❌ Error setting FFmpeg path: ${error.message}`);
+    }
   }
+  
+  // If we get here, FFmpeg wasn't found anywhere
+  Max.post('❌ FFmpeg not found in any expected location!');
+  Max.post('📋 To fix this, you can:');
+  Max.post('   1. Install FFmpeg via chocolatey: choco install ffmpeg');
+  Max.post('   2. Install FFmpeg via winget: winget install ffmpeg');
+  Max.post('   3. Download from https://ffmpeg.org and extract to C:\\g4l\\ffmpeg\\');
+  Max.post('   4. Add FFmpeg to your system PATH');
+  
+  return false;
 }
 
 // Call this function when initializing your application

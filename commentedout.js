@@ -14,12 +14,14 @@ const http = require('http');
 // const BACKEND_URL = 'http://localhost:8000';
 // const STABLE_AUDIO_HOST = 'localhost';
 // const STABLE_AUDIO_PORT = 8005;
+// const STABLE_AUDIO_PATH = '/generate';  // Direct to service
 // const USE_HTTPS = false;
 
 // Production URLs (default):
 const BACKEND_URL = 'https://g4l.thecollabagepatch.com';
 const STABLE_AUDIO_HOST = 'g4l.thecollabagepatch.com';
 const STABLE_AUDIO_PORT = 443;
+const STABLE_AUDIO_PATH = '/audio/generate';  // Through Caddy proxy
 const USE_HTTPS = true;
 
 // =============================================================================
@@ -108,7 +110,7 @@ Max.addHandler('generate_stable_audio', () => {
     const options = {
         hostname: STABLE_AUDIO_HOST,
         port: STABLE_AUDIO_PORT,
-        path: '/audio/generate',
+        path: STABLE_AUDIO_PATH,  // Use the configurable path
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
