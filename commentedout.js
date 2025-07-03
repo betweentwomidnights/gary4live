@@ -5,11 +5,26 @@ const io = require('socket.io-client');
 const https = require('https');
 const http = require('http');
 
-// if using localhost with our github repo https://github.com/betweentwomidnights/gary-backend-combined
-//const socket = io('http://localhost:8000', {
+// =============================================================================
+// CONFIGURATION - Change these URLs when building from source with localhost
+// =============================================================================
 
-    // our backend url
-const socket = io('https://g4l.thecollabagepatch.com', {
+// For localhost development with our github repo https://github.com/betweentwomidnights/gary-backend-combined
+// Uncomment these lines and comment out the production URLs below:
+// const BACKEND_URL = 'http://localhost:8000';
+// const STABLE_AUDIO_HOST = 'localhost';
+// const STABLE_AUDIO_PORT = 8005;
+// const USE_HTTPS = false;
+
+// Production URLs (default):
+const BACKEND_URL = 'https://g4l.thecollabagepatch.com';
+const STABLE_AUDIO_HOST = 'g4l.thecollabagepatch.com';
+const STABLE_AUDIO_PORT = 443;
+const USE_HTTPS = true;
+
+// =============================================================================
+
+const socket = io(BACKEND_URL, {
     transports: ['websocket'], // Force WebSocket usage
     reconnection: true, // Enable auto-reconnection
     reconnectionAttempts: Infinity, // Unlimited reconnection attempts
@@ -89,9 +104,10 @@ Max.addHandler('generate_stable_audio', () => {
         seed: -1 // Random seed
     });
 
-    // Configure the HTTP request
+    // Configure the HTTP request using the configuration variables
     const options = {
-        hostname: 'g4l.thecollabagepatch.com',
+        hostname: STABLE_AUDIO_HOST,
+        port: STABLE_AUDIO_PORT,
         path: '/audio/generate',
         method: 'POST',
         headers: {
@@ -100,8 +116,11 @@ Max.addHandler('generate_stable_audio', () => {
         }
     };
 
+    // Use the appropriate HTTP module based on configuration
+    const httpModule = USE_HTTPS ? https : http;
+
     // Make the HTTP request
-    const req = https.request(options, (res) => {
+    const req = httpModule.request(options, (res) => {
         let responseData = '';
 
         res.on('data', (chunk) => {

@@ -15,7 +15,8 @@ const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({ action }) => {
         retry: 'regenerating audio...',
         load_output: 'loading output...',
         crop: 'cropping audio...',
-        transform: 'transforming audio...'
+        transform: 'transforming audio...',
+        reset_transform: 'clearing session state... you\'ll now go back to transforming the top waveform'
     };
 
     const message = actionMessages[action] || 'processing...';

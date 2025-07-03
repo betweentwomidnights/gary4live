@@ -79,15 +79,11 @@ the final remaining edge cases revolve around these two files: myBuffer.wav and 
 
 do NOT:
 
-- drag them into the ableton timeline.
+- drag them into the timeline (the 'drag me' option in electron is fine. that's a copy of myOutput.wav).
 - manually change myBuffer.wav to a 6 minute audio file. it should only be changed by our write function and should be a maximum of 30 seconds.
 
 if you rly wanna learn how to use this thing, head to discord https://discord.gg/VECkyXEnAd and yell at me, or go to https://youtube.com/@thepatch_dev
 
 there is a separate repository for the mac front-end (https://github.com/betweentwomidnights/gary-mac)
-
-demo of the device being used here:
-
-[![demo video](https://img.youtube.com/vi/ZqgcRiAlrHQ/0.jpg)](https://www.youtube.com/watch?v=0plq4OV0ECY)
 
 the backend for this device can be run locally using docker-compose. (https://github.com/betweentwomidnights/gary-backend-combined)

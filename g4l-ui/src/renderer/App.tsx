@@ -74,7 +74,7 @@ function Hello() {
 
   const isGenerating = loadingAction !== null || (progress > 0 && progress < 100);
 
-  const [flowstepValue, setFlowstepValue] = useState(101); // Default to 80 (maps to 0.12)
+  const [flowstepValue, setFlowstepValue] = useState(101); // Default to 101 (maps to 0.13)
 
   const [promptText, setPromptText] = useState('aggressive techno');
 
@@ -812,7 +812,7 @@ const handleFlowstepChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       // Wait briefly for undo to complete, then trigger load_output to reset state
       setTimeout(() => {
         sendToNodeScript({ action: 'load_output' });
-      }, 1200);
+      }, 1500);
     }}
     className="undo-transform-button"
   >
@@ -825,38 +825,47 @@ const handleFlowstepChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     )}
   </button>
 
-  <button
-  type="button"
-  disabled={isGenerating || !backendConnection}
-  onClick={() => {
-        // Clear session state immediately for responsive UI
-    setHasActiveSession(false);
-    setCurrentSessionId(null);
-    // Use our existing handlers to ensure proper communication
-    handleFlowstepChange({ target: { value: '101' } } as React.ChangeEvent<HTMLInputElement>);
-    setSelectedVariation('accordion_folk');
-    
-    sendToNodeScript({
-      action: 'reset_transform',
-      data: {
-        modelPath,
-        promptDuration,
-        variation: 'accordion_folk'
-      }
-    });
-  }}
-  className="reset-transform-button"
->
-  reset
-  {guideVisible && (
-    <GuideNumber
-      number={15}
-      blurb="press reset to restart the session so you can go back to transforming the recorded audio in the top waveform rather than the bottom waveform. it also restarts your session with gary so be careful"
-    />
-  )}
-</button>
-</div>
-</div>
+        <button
+          type="button"
+          disabled={isGenerating || !backendConnection}
+          onClick={() => {
+            // Show the notification immediately
+            setLoadingAction('reset_transform');
+            
+            // Clear session state immediately for responsive UI
+            setHasActiveSession(false);
+            setCurrentSessionId(null);
+            
+            // Use our existing handlers to ensure proper communication
+            handleFlowstepChange({ target: { value: '101' } } as React.ChangeEvent<HTMLInputElement>);
+            setSelectedVariation('accordion_folk');
+            
+            sendToNodeScript({
+              action: 'reset_transform',
+              data: {
+                modelPath,
+                promptDuration,
+                variation: 'accordion_folk'
+              }
+            });
+            
+            // Clear the notification after 2 seconds
+            setTimeout(() => {
+              setLoadingAction(null);
+            }, 2000);
+          }}
+          className="reset-transform-button"
+        >
+          reset
+          {guideVisible && (
+            <GuideNumber
+              number={15}
+              blurb="press reset to restart the session so you can go back to transforming the recorded audio in the top waveform rather than the bottom waveform. it also restarts your session with gary so be careful"
+            />
+          )}
+      </button>
+    </div>
+  </div>
 </div>
 
 {/* Progress and variation select row */}
