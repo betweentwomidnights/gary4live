@@ -181,14 +181,14 @@ const RecordingProgressWaveform = ({ progress, isVisible }: { progress: number, 
       console.log('Received toggle-guide:', isGuideVisible);
     });
   }, []);
-
+// I guess the backend: WebAudio isn't a thing in newer environments
   useEffect(() => {
     if (waveformRef.current) {
       waveSurferRef.current = WaveSurfer.create({
         container: waveformRef.current,
         waveColor: 'red',
         progressColor: 'maroon',
-        backend: 'WebAudio',
+        // backend: 'WebAudio',
         interact: true,
         height: 50,
         duration: 30,
@@ -199,7 +199,7 @@ const RecordingProgressWaveform = ({ progress, isVisible }: { progress: number, 
         container: waveformOutRef.current,
         waveColor: 'red',
         progressColor: 'maroon',
-        backend: 'WebAudio',
+        // backend: 'WebAudio',
         interact: true,
         height: 50,
       });
